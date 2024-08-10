@@ -6,6 +6,10 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+
+    globalSettings = new QSettings("DXS_GROUP", "CodeKeeper");
+
 }
 
 MainWindow::~MainWindow()
