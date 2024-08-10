@@ -1,3 +1,8 @@
 src/LogInsight/build/*/
 src/LogInsight/build/*.*
-
+src/LogInsight/.qt/
+src/LogInsight/CMakeFiles/
+src/LogInsight/CMakeCache.txt
+src/LogInsight/LogInsight_autogen/
+src/LogInsight/LogInsight
+src/LogInsight/cmake_install.cmake
