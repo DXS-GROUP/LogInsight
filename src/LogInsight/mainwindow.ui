@@ -46,7 +46,7 @@
            <number>0</number>
           </property>
           <item row="0" column="0">
-           <widget class="QTableWidget" name="tableWidget">
+           <widget class="QTableWidget" name="logData">
             <property name="mouseTracking">
              <bool>true</bool>
             </property>
@@ -145,7 +145,7 @@
             </column>
             <column>
              <property name="text">
-              <string>Function</string>
+              <string>Code</string>
              </property>
             </column>
             <column>
@@ -755,6 +755,8 @@
     <addaction name="actionGet_all_warning_messages"/>
     <addaction name="actionGet_all_debug_messages"/>
     <addaction name="actionGet_all_info_messages"/>
+    <addaction name="separator"/>
+    <addaction name="actionShow_charts"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="styleSheet">
@@ -801,6 +803,11 @@
   <action name="actionFolder">
    <property name="text">
     <string>Folder</string>
+   </property>
+  </action>
+  <action name="actionShow_charts">
+   <property name="text">
+    <string>Show failure graph</string>
    </property>
   </action>
  </widget>
