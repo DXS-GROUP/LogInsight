@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QSettings>
+#include <QSizeGrip>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -17,7 +19,17 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void createConnects();
+
+    void closeApp();
+    void minimizeApp();
+    void maximizeApp();
+
 private:
+    QSettings *globalSettings;
+    QSizeGrip *sizeGrip;
+
     Ui::MainWindow *ui;
 };
 #endif // MAINWINDOW_H
