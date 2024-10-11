@@ -4,9 +4,9 @@
 
 ### Program for analyzing log files and detecting anomalies in program operation
 
-![](https://github.com/Nighty3098/DevIcons/blob/main/badges/badges_c.png?raw=true)
-![](https://github.com/Nighty3098/DevIcons/blob/main/badges/badges_linux.png?raw=true)
-![](https://github.com/Nighty3098/DevIcons/blob/main/badges/badges_mac.png?raw=true)
+<img src="https://github.com/Nighty3098/DevIcons/blob/main/badges/badges_c.png?raw=true" width="50px" />
+<img src="https://github.com/Nighty3098/DevIcons/blob/main/badges/badges_linux.png?raw=true" width="50px" />
+<img src="https://github.com/Nighty3098/DevIcons/blob/main/badges/badges_mac.png?raw=true" width="50px" />
 
 #### Installing:
 
