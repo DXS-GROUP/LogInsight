@@ -1,6 +1,7 @@
 #include "log_monitor.h"
 #include "log_filter.h"
 #include "log_color.h"
+#include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -94,15 +95,28 @@ void start_log_monitor(const char *file_name, const char *filter_level)
                 {
                     colorize_log(line); // Colorize and print the log line
 
-                    // Update statistics based on log level
-                    if (strstr(line, "| CRITICAL |"))
-                        critical_count++;
-                    else if (strstr(line, "| WARNING |"))
-                        warning_count++;
-                    else if (strstr(line, "| INFO |"))
-                        info_count++;
-                    else if (strstr(line, "| DEBUG |"))
-                        debug_count++;
+                    // Update statistics based on log level using regex
+                    regex_t regex;
+                    int reti;
+
+                    // Define patterns for each log level
+                    const char *patterns[] = {
+                        "\\|\\s*CRITICAL\\s*\\|",
+                        "\\|\\s*WARNING\\s*\\|",
+                        "\\|\\s*INFO\\s*\\|",
+                        "\\|\\s*DEBUG\\s*\\|"};
+
+                    int *counts[] = {&critical_count, &warning_count, &info_count, &debug_count};
+
+                    for (int i = 0; i < 4; i++)
+                    {
+                        reti = regcomp(&regex, patterns[i], REG_EXTENDED);
+                        if (reti == 0 && regexec(&regex, line, 0, NULL, 0) == 0)
+                        {
+                            (*counts[i])++; // Increment the corresponding count
+                        }
+                        regfree(&regex);
+                    }
                 }
                 line = strtok(NULL, "\n");
             }
