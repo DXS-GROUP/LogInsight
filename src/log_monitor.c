@@ -17,12 +17,10 @@
 #define EVENT_SIZE (sizeof(struct inotify_event))
 #define EVENT_BUF_LEN (1024 * (EVENT_SIZE + 16))
 
-static int running = 1; // Flag to control the main loop
+static int running = 1;
 
-// Mutex for protecting shared resources
 pthread_mutex_t count_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-// Initialize log statistics
 long int critical_count = 0;
 long int warning_count = 0;
 long int info_count = 0;
@@ -41,13 +39,13 @@ int compile_regex(regex_t *regex, const char *pattern) {
 }
 
 void *count_log_levels(void *arg) {
-  const char *line = (const char *)arg; // Cast arg back to const char*
+  const char *line = (const char *)arg;
 
   regex_t regex;
   const char *patterns[] = {"\\|\\s*CRITICAL\\s*\\|", "\\|\\s*WARNING\\s*\\|",
                             "\\|\\s*INFO\\s*\\|", "\\|\\s*DEBUG\\s*\\|"};
 
-  pthread_mutex_lock(&count_mutex); // Lock mutex before updating counts
+  pthread_mutex_lock(&count_mutex);
 
   for (int i = 0; i < 4; i++) {
     if (compile_regex(&regex, patterns[i]) == 0 &&
@@ -71,7 +69,7 @@ void *count_log_levels(void *arg) {
     regfree(&regex);
   }
 
-  pthread_mutex_unlock(&count_mutex); // Unlock mutex after updating counts
+  pthread_mutex_unlock(&count_mutex);
 
   return NULL;
 }
@@ -81,14 +79,13 @@ void process_lines(char *buffer, const char *filter_level) {
 
   while (line != NULL) {
     if (should_print_log(line, filter_level)) {
-      colorize_log(line); // Colorize and print the log line
+      colorize_log(line);
       count_log_levels(line);
     }
     line = strtok(NULL, "\n");
   }
 }
 
-// Function to print log statistics
 void print_statistics() {
   printf("\nLog Statistics:\n");
   printf("CRITICAL: %d\n", critical_count);
@@ -109,24 +106,22 @@ void start_log_monitor(const char *file_name, const char *filter_level,
 
   char buffer[BUFFER_SIZE];
 
-  // If not in real-time mode, read and process existing log entries
   if (!real_time) {
     ssize_t bytes_read;
 
     while ((bytes_read = read(fd, buffer, sizeof(buffer) - 1)) > 0) {
-      buffer[bytes_read] = '\0'; // Null-terminate the string
+      buffer[bytes_read] = '\0';
 
-      process_lines(buffer, filter_level); // Process lines from buffer
+      process_lines(buffer, filter_level);
     }
 
-    close(fd); // Close file and exit after processing existing logs
+    close(fd);
 
-    print_statistics(); // Call the function to print statistics
+    print_statistics();
 
     return;
   }
 
-  // Initialize inotify for real-time monitoring only if -r is set
   int inotify_fd = inotify_init();
   if (inotify_fd < 0) {
     perror("inotify_init");
@@ -142,8 +137,7 @@ void start_log_monitor(const char *file_name, const char *filter_level,
     return;
   }
 
-  off_t offset =
-      lseek(fd, 0, SEEK_END); // Start reading from the end of the file
+  off_t offset = lseek(fd, 0, SEEK_END);
 
   while (running) {
     char event_buf[EVENT_BUF_LEN];
@@ -151,21 +145,21 @@ void start_log_monitor(const char *file_name, const char *filter_level,
     if (read(inotify_fd, event_buf, EVENT_BUF_LEN) < 0)
       break;
 
-    lseek(fd, offset, SEEK_SET); // Move to the last known offset
+    lseek(fd, offset, SEEK_SET);
     ssize_t bytes_read = read(fd, buffer, sizeof(buffer) - 1);
 
     if (bytes_read > 0) {
-      buffer[bytes_read] = '\0'; // Null-terminate the string
+      buffer[bytes_read] = '\0';
 
-      process_lines(buffer, filter_level); // Process lines from buffer
+      process_lines(buffer, filter_level);
 
-      offset += bytes_read; // Update the offset
+      offset += bytes_read;
     }
   }
 
   inotify_rm_watch(inotify_fd, wd);
 
-  print_statistics(); // Call the function to print statistics before exiting
+  print_statistics();
 
   close(fd);
 }
