@@ -6,3 +6,5 @@ src/LogInsight/CMakeCache.txt
 src/LogInsight/LogInsight_autogen/
 src/LogInsight/LogInsight
 src/LogInsight/cmake_install.cmake
+/obj
+log_monitor
