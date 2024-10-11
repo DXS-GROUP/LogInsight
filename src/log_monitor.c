@@ -12,12 +12,21 @@
 #include <sys/inotify.h>
 #include <errno.h>
 #include <signal.h>
+#include <pthread.h>
 
 #define BUFFER_SIZE 4096
 #define EVENT_SIZE (sizeof(struct inotify_event))
 #define EVENT_BUF_LEN (1024 * (EVENT_SIZE + 16))
 
 static int running = 1; // Flag to control the main loop
+
+// Mutex for protecting shared resources
+pthread_mutex_t count_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+int critical_count = 0;
+int warning_count = 0;
+int info_count = 0;
+int debug_count = 0;
 
 void handle_signal(int signal)
 {
@@ -26,6 +35,48 @@ void handle_signal(int signal)
         running = 0; // Set flag to exit the loop
         printf("\nExiting gracefully...\n");
     }
+}
+
+void *count_log_levels(void *arg)
+{
+    char *line = (char *)arg;
+
+    regex_t regex;
+    int reti;
+
+    // Define patterns for each log level
+    const char *patterns[] = {
+        "\\|\\s*CRITICAL\\s*\\|",
+        "\\|\\s*WARNING\\s*\\|",
+        "\\|\\s*INFO\\s*\\|",
+        "\\|\\s*DEBUG\\s*\\|"};
+
+    while (line != NULL)
+    {
+        pthread_mutex_lock(&count_mutex); // Lock mutex before updating counts
+
+        for (int i = 0; i < 4; i++)
+        {
+            reti = regcomp(&regex, patterns[i], REG_EXTENDED);
+            if (reti == 0 && regexec(&regex, line, 0, NULL, 0) == 0)
+            {
+                if (i == 0)
+                    critical_count++;
+                else if (i == 1)
+                    warning_count++;
+                else if (i == 2)
+                    info_count++;
+                else if (i == 3)
+                    debug_count++;
+            }
+            regfree(&regex);
+        }
+
+        pthread_mutex_unlock(&count_mutex); // Unlock mutex after updating counts
+
+        line = strtok(NULL, "\n");
+    }
+    return NULL;
 }
 
 void start_log_monitor(const char *file_name, const char *filter_level)
@@ -59,12 +110,6 @@ void start_log_monitor(const char *file_name, const char *filter_level)
     off_t offset = lseek(fd, 0, SEEK_END); // Start reading from the end of the file
     char buffer[BUFFER_SIZE];
 
-    // Initialize log statistics
-    int critical_count = 0;
-    int warning_count = 0;
-    int info_count = 0;
-    int debug_count = 0;
-
     while (running)
     {
         char event_buf[EVENT_BUF_LEN];
@@ -89,34 +134,17 @@ void start_log_monitor(const char *file_name, const char *filter_level)
 
             // Process each line in the buffer
             char *line = strtok(buffer, "\n");
+            pthread_t count_thread;
+
             while (line != NULL)
             {
                 if (should_print_log(line, filter_level))
                 {
                     colorize_log(line); // Colorize and print the log line
 
-                    // Update statistics based on log level using regex
-                    regex_t regex;
-                    int reti;
-
-                    // Define patterns for each log level
-                    const char *patterns[] = {
-                        "\\|\\s*CRITICAL\\s*\\|",
-                        "\\|\\s*WARNING\\s*\\|",
-                        "\\|\\s*INFO\\s*\\|",
-                        "\\|\\s*DEBUG\\s*\\|"};
-
-                    int *counts[] = {&critical_count, &warning_count, &info_count, &debug_count};
-
-                    for (int i = 0; i < 4; i++)
-                    {
-                        reti = regcomp(&regex, patterns[i], REG_EXTENDED);
-                        if (reti == 0 && regexec(&regex, line, 0, NULL, 0) == 0)
-                        {
-                            (*counts[i])++; // Increment the corresponding count
-                        }
-                        regfree(&regex);
-                    }
+                    // Create a thread to count log levels
+                    pthread_create(&count_thread, NULL, count_log_levels, line);
+                    pthread_detach(count_thread); // Detach thread to allow it to run independently
                 }
                 line = strtok(NULL, "\n");
             }
