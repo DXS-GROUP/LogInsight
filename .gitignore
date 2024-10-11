@@ -8,3 +8,4 @@ src/LogInsight/LogInsight
 src/LogInsight/cmake_install.cmake
 /obj
 log_monitor
+.vscode/settings.json

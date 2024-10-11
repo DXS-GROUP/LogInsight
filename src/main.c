@@ -8,6 +8,7 @@ int main(int argc, char *argv[])
 {
     const char *file_name = NULL;
     const char *filter_level = NULL;
+    int real_time = 0; // Flag for real-time output
 
     for (int i = 1; i < argc; i++)
     {
@@ -19,15 +20,19 @@ int main(int argc, char *argv[])
         {
             filter_level = argv[++i];
         }
+        else if (strcmp(argv[i], "-r") == 0) // Check for -r flag
+        {
+            real_time = 1; // Set real-time flag
+        }
     }
 
     if (!file_name)
     {
-        fprintf(stderr, "Usage: %s -i <file> [-f <level>]\n", argv[0]);
+        fprintf(stderr, "Usage: %s -i <file> [-f <level>] [-r]\n", argv[0]);
         return EXIT_FAILURE;
     }
 
-    start_log_monitor(file_name, filter_level);
+    start_log_monitor(file_name, filter_level, real_time); // Pass real_time to the function
 
     return EXIT_SUCCESS;
 }

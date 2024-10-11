@@ -1,6 +1,7 @@
 #include "log_color.h"
 #include <stdio.h>
 #include <string.h>
+#include <regex.h>
 
 // Define ANSI color codes
 #define RED "\033[0;31m"
@@ -11,24 +12,51 @@
 
 void colorize_log(const char *line)
 {
-    if (strstr(line, "| CRITICAL |") != NULL)
+    regex_t regex;
+    int reti;
+
+    // Define patterns for each log level with optional spaces and case insensitivity
+    const char *patterns[] = {
+        "\\|\\s*CRITICAL\\s*\\|", // Pattern for CRITICAL
+        "\\|\\s*WARNING\\s*\\|",  // Pattern for WARNING
+        "\\|\\s*INFO\\s*\\|",     // Pattern for INFO
+        "\\|\\s*DEBUG\\s*\\|"     // Pattern for DEBUG
+    };
+
+    // Check each pattern against the log line
+    for (int i = 0; i < 4; i++)
     {
-        printf("%s%s%s\n", RED, line, NC);
+        reti = regcomp(&regex, patterns[i], REG_EXTENDED | REG_ICASE); // Use REG_ICASE for case-insensitive matching
+        if (reti)
+        {
+            fprintf(stderr, "Could not compile regex\n");
+            return;
+        }
+
+        // Execute regex
+        reti = regexec(&regex, line, 0, NULL, 0);
+        if (reti == 0)
+        { // If a match is found
+            switch (i)
+            {
+            case 0: // CRITICAL
+                printf("%s%s%s\n", RED, line, NC);
+                break;
+            case 1: // WARNING
+                printf("%s%s%s\n", YELLOW, line, NC);
+                break;
+            case 2: // INFO
+                printf("%s%s%s\n", GREEN, line, NC);
+                break;
+            case 3: // DEBUG
+                printf("%s%s%s\n", BLUE, line, NC);
+                break;
+            }
+            regfree(&regex); // Free regex memory after use
+            return;          // Exit after printing the colored log line
+        }
+        regfree(&regex); // Free regex memory after use
     }
-    else if (strstr(line, "| WARNING |") != NULL)
-    {
-        printf("%s%s%s\n", YELLOW, line, NC);
-    }
-    else if (strstr(line, "| INFO |") != NULL)
-    {
-        printf("%s%s%s\n", GREEN, line, NC);
-    }
-    else if (strstr(line, "| DEBUG |") != NULL)
-    {
-        printf("%s%s%s\n", BLUE, line, NC);
-    }
-    else
-    {
-        printf("%s\n", line); // Default output without coloring
-    }
+
+    printf("%s\n", line); // Default output without coloring if no match is found
 }
