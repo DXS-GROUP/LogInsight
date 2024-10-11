@@ -4,7 +4,8 @@
 #include <pthread.h> // Include pthread for multithreading
 
 // Function declarations
-void start_log_monitor(const char *file_name, const char *filter_level, int real_time);
+void start_log_monitor(const char *file_name, const char *filter_level,
+                       int real_time);
 void *count_log_levels(void *arg); // Function to count log levels
 
 // Mutex for protecting shared resources
