@@ -31,7 +31,7 @@ int debug_count = 0;
 void handle_signal(int signal) {
   if (signal == SIGINT) {
     running = 0; // Set flag to exit the loop
-    printf("\nExiting gracefully...\n");
+    printf("\nExiting ...\n");
   }
 }
 
@@ -92,6 +92,15 @@ void process_lines(char *buffer, const char *filter_level) {
   }
 }
 
+// Function to print log statistics
+void print_statistics() {
+  printf("\nLog Statistics:\n");
+  printf("CRITICAL: %d\n", critical_count);
+  printf("WARNING: %d\n", warning_count);
+  printf("INFO: %d\n", info_count);
+  printf("DEBUG: %d\n", debug_count);
+}
+
 void start_log_monitor(const char *file_name, const char *filter_level,
                        int real_time) {
   signal(SIGINT, handle_signal);
@@ -116,12 +125,7 @@ void start_log_monitor(const char *file_name, const char *filter_level,
 
     close(fd); // Close file and exit after processing existing logs
 
-    // Print statistics before exiting
-    printf("\nLog Statistics:\n");
-    printf("CRITICAL: %d\n", critical_count);
-    printf("WARNING: %d\n", warning_count);
-    printf("INFO: %d\n", info_count);
-    printf("DEBUG: %d\n", debug_count);
+    // print_statistics(); // Call the function to print statistics
 
     return;
   }
@@ -147,20 +151,12 @@ void start_log_monitor(const char *file_name, const char *filter_level,
 
   while (running) {
     char event_buf[EVENT_BUF_LEN];
-    int length = read(inotify_fd, event_buf, EVENT_BUF_LEN);
 
-    if (length < 0) {
-      perror("read");
+    if (read(inotify_fd, event_buf, EVENT_BUF_LEN) < 0)
       break;
-    }
 
     lseek(fd, offset, SEEK_SET); // Move to the last known offset
     ssize_t bytes_read = read(fd, buffer, sizeof(buffer) - 1);
-
-    if (bytes_read == -1) {
-      perror("read");
-      break;
-    }
 
     if (bytes_read > 0) {
       buffer[bytes_read] = '\0'; // Null-terminate the string
@@ -173,13 +169,7 @@ void start_log_monitor(const char *file_name, const char *filter_level,
 
   inotify_rm_watch(inotify_fd, wd);
 
-  // Print statistics before exiting in real-time mode as well.
-  printf("\nLog Statistics:\n");
-  printf("CRITICAL: %d\n", critical_count);
-  printf("WARNING: %d\n", warning_count);
-  printf("INFO: %d\n", info_count);
-  printf("DEBUG: %d\n", debug_count);
+  // print_statistics(); // Call the function to print statistics before exiting
 
   close(fd);
-  close(inotify_fd);
 }
