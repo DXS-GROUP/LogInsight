@@ -10,11 +10,11 @@
 
 #### Installing:
 
+</div>
+
 ```bash
 git clone https://github.com/Nighty3098/LogInsight
 cd LogInsight
 make
 ./LogInsight
 ```
-
-</div>
