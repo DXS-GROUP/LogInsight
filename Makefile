@@ -15,22 +15,12 @@ YELLOW=\033[1;33m
 BLUE=\033[0;34m
 RESET=\033[0m
 
-
-
+LOGO=\n\n${GREEN}▄▄▌         ▄▄ • ▪   ▐ ▄ .▄▄ · ▪   ▄▄ •  ▄ .▄▄▄▄▄▄\n██•  ▪     ▐█ ▀ ▪██ •█▌▐█▐█ ▀. ██ ▐█ ▀ ▪██▪▐█•██  \n██▪   ▄█▀▄ ▄█ ▀█▄▐█·▐█▐▐▌▄▀▀▀█▄▐█·▄█ ▀█▄██▀▐█ ▐█.▪\n▐█▌▐▌▐█▌.▐▌▐█▄▪▐█▐█▌██▐█▌▐█▄▪▐█▐█▌▐█▄▪▐███▌▐▀ ▐█▌·\n.▀▀▀  ▀█▄▀▪·▀▀▀▀ ▀▀▀▀▀ █▪ ▀▀▀▀ ▀▀▀·▀▀▀▀ ▀▀▀ · ▀▀▀\n${YELLOW}                 LogInsight v$(VERSION)\n\n
 
 all: $(OBJECTS)
 	@mkdir -p $(OBJ_DIR) # Ensure obj directory exists
 	$(CC) $(CFLAGS) -o LogInsight $(OBJECTS)
-	@echo -e ""
-	@echo -e ""
-	@echo -e "${GREEN}"
-	@echo -e "▄▄▌         ▄▄ • ▪   ▐ ▄ .▄▄ · ▪   ▄▄ •  ▄ .▄▄▄▄▄▄"
-	@echo -e "██•  ▪     ▐█ ▀ ▪██ •█▌▐█▐█ ▀. ██ ▐█ ▀ ▪██▪▐█•██  "
-	@echo -e "██▪   ▄█▀▄ ▄█ ▀█▄▐█·▐█▐▐▌▄▀▀▀█▄▐█·▄█ ▀█▄██▀▐█ ▐█.▪"
-	@echo -e "▐█▌▐▌▐█▌.▐▌▐█▄▪▐█▐█▌██▐█▌▐█▄▪▐█▐█▌▐█▄▪▐███▌▐▀ ▐█▌·"
-	@echo -e ".▀▀▀  ▀█▄▀▪·▀▀▀▀ ▀▀▀▀▀ █▪ ▀▀▀▀ ▀▀▀·▀▀▀▀ ▀▀▀ · ▀▀▀ "
-	@echo -e ""
-	@echo -e "${YELLOW}                 LogInsight v$(VERSION)"
+	@echo -e "${LOGO}"
 	@echo -e "${YELLOW}            💫 Created by Nighty3098"
 	@echo -e "${YELLOW}          https://nighty3098.github.io/"
 	@echo -e ""
@@ -47,12 +37,30 @@ clean:
 run: all
 	./LogInsight
 
+install:
+	@echo -e "${LOGO}"
+	@echo -e "${YELLOW}"
+	@echo -e "             🚀 Installing LogInsight..."
+	@sudo cp LogInsight /usr/bin/
+	@echo -e "${GREEN}"
+	@echo -e "    🔥 You can run the program with the command:"
+	@echo -e "                     LogInsight"
+
+uninstall:
+	@echo -e "${LOGO}"
+	@echo -e "${YELLOW}"
+	@echo -e "           🚀 Uninstalling LogInsight..."
+	@sudo rm /usr/bin/LogInsight
+	@echo -e "${GREEN}                   🔥 Done!"
+
 help:
-	@echo -e "${RED}Makefile for LogInsight${RESET}"
-	@echo -e "${YELLOW}Usage:"
-	@echo -e "  make        Build the project"
-	@echo -e "  make run    Build and run the project"
-	@echo -e "  make clean  Remove object files and the executable"
-	@echo -e "  make help   Show this help message${RESET}"
+	@echo -e "${LOGO}"
+	@echo -e "${YELLOW}🛠️ Usage:"
+	@echo -e "  make              Build the project"
+	@echo -e "  make run          Build and run the project"
+	@echo -e "  make clean        Remove object files and the executable"
+	@echo -e "  make install      Install app"
+	@echo -e "  make uninstall    Uninstall app"
+	@echo -e "  make help         Show this help message${RESET}"
 
 .PHONY: all clean run help
