@@ -43,7 +43,6 @@ Usage: ./LogInsight [-r] [-f <level>] -i <file>
   -r             Display all changes in real time
   -f <level>     Level filtering (CRITICAL, WARNING, INFO, DEBUG)
   -i <file>      Path to log file
-  -o <output>    Path to output file
   -h, --help     Show this help
 ```
 <img src="imgs/2.png" />
