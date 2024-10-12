@@ -35,7 +35,6 @@ void handle_signal(int signal)
   }
 }
 
-// Function to compile regex patterns with case insensitivity
 int compile_regex(regex_t *regex, const char *pattern)
 {
   return regcomp(regex, pattern, REG_EXTENDED | REG_ICASE);
@@ -88,19 +87,17 @@ void process_lines(char *buffer, const char *filter_level, FILE *output_file)
   {
     if (should_print_log(line, filter_level))
     {
-      colorize_log(line); // Apply colorization first
-
-      // Output to file if specified
       if (output_file != NULL)
       {
-        fprintf(output_file, "%s\n", line); // Write to file only
+        fprintf(output_file, "%s\n", line);
       }
       else
       {
-        printf("%s\n", line); // Print to console only if no file is specified
+        colorize_log(line);
+        // printf("%s\n", line); // Print to console only if no file is specified
       }
 
-      count_log_levels(line); // Count log levels regardless of output destination
+      count_log_levels(line);
     }
     line = strtok(NULL, "\n");
   }
@@ -163,16 +160,14 @@ void start_log_monitor(const char *file_name, const char *filter_level,
 
     close(fd);
 
-    print_statistics(output_file); // Pass output file for statistics
+    print_statistics(output_file);
 
     if (output_file != NULL)
-      fclose(output_file); // Close file if it was opened
+      fclose(output_file);
     return;
   }
 
-  // Real-time monitoring logic would go here...
-
   if (output_file != NULL)
-    fclose(output_file); // Close file if it was opened
+    fclose(output_file);
   close(fd);
 }

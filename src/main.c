@@ -6,12 +6,21 @@
 
 void print_usage(const char *program_name)
 {
+  printf("\n");
+  printf("\n\033[0;32m");
+  printf("▄▄▌         ▄▄ • ▪   ▐ ▄ .▄▄ · ▪   ▄▄ •  ▄ .▄▄▄▄▄▄\n");
+  printf("██•  ▪     ▐█ ▀ ▪██ •█▌▐█▐█ ▀. ██ ▐█ ▀ ▪██▪▐█•██  \n");
+  printf("██▪   ▄█▀▄ ▄█ ▀█▄▐█·▐█▐▐▌▄▀▀▀█▄▐█·▄█ ▀█▄██▀▐█ ▐█.▪\n");
+  printf("▐█▌▐▌▐█▌.▐▌▐█▄▪▐█▐█▌██▐█▌▐█▄▪▐█▐█▌▐█▄▪▐███▌▐▀ ▐█▌·\n");
+  printf(".▀▀▀  ▀█▄▀▪·▀▀▀▀ ▀▀▀▀▀ █▪ ▀▀▀▀ ▀▀▀·▀▀▀▀ ▀▀▀ · ▀▀▀ \n");
+  printf("\n");
+  printf("\n\033[1;33m");
   printf("Usage: %s [-r] [-f <level>] -i <file> [-o <output>]\n", program_name);
   printf("  -r             Display all changes in real time\n");
   printf("  -f <level>     Level filtering (CRITICAL, WARNING, INFO, DEBUG)\n");
   printf("  -i <file>      Path to log file\n");
   printf("  -o <output>    Path to output file\n");
-  printf("  -h, --help     Show this help\n");
+  printf("  -h, --help     Show this help\n\033[0m");
 }
 
 int main(int argc, char *argv[])
