@@ -4,7 +4,7 @@
 #include <pthread.h>
 
 void start_log_monitor(const char *file_name, const char *filter_level,
-                       int real_time, const char *output_file_name);
+                       int real_time);
 void *count_log_levels(void *arg);
 
 extern pthread_mutex_t count_mutex;
