@@ -12,3 +12,5 @@ log_monitor
 LogInsight
 .vscode/launch.json
 .vscode/c_cpp_properties.json
+managed_context/metadata.json
+test_suite_analysis/metadata.json
