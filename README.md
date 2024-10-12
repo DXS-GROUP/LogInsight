@@ -2,6 +2,8 @@
 
 # LogInsight
 
+<img src="imgs/1.png" />
+
 ### Program for analyzing log files and detecting anomalies in program operation
 
 <img src="https://github.com/Nighty3098/DevIcons/blob/main/badges/badges_c.png?raw=true" width="50px" />
@@ -32,3 +34,4 @@ Usage: ./LogInsight [-r] [-f <level>] -i <file>
   -i <file>      Path to log file
   -h, --help     Show this help
 ```
+<img src="imgs/2.png" />
