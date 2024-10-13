@@ -10,10 +10,11 @@ int should_print_log(const char *line, const char *filter_level) {
   }
 
   char filter_level_lower[256];
-  for (size_t i = 0; i < strlen(filter_level); i++) {
+  size_t filter_length = strlen(filter_level);
+  for (size_t i = 0; i < filter_length; i++) {
     filter_level_lower[i] = tolower((unsigned char)filter_level[i]);
   }
-  filter_level_lower[strlen(filter_level)] = '\0';
+  filter_level_lower[filter_length] = '\0';
 
   char pattern[256];
   snprintf(pattern, sizeof(pattern), "\\|\\s*%s\\s*\\|", filter_level_lower);
@@ -26,6 +27,7 @@ int should_print_log(const char *line, const char *filter_level) {
   }
 
   reti = regexec(&regex, line, 0, NULL, 0);
+
   regfree(&regex);
 
   return reti == 0;
