@@ -15,7 +15,7 @@ YELLOW=\033[1;33m
 BLUE=\033[0;34m
 RESET=\033[0m
 
-LOGO=\n\n${GREEN}▄▄▌         ▄▄ • ▪   ▐ ▄ .▄▄ · ▪   ▄▄ •  ▄ .▄▄▄▄▄▄\n██•  ▪     ▐█ ▀ ▪██ •█▌▐█▐█ ▀. ██ ▐█ ▀ ▪██▪▐█•██  \n██▪   ▄█▀▄ ▄█ ▀█▄▐█·▐█▐▐▌▄▀▀▀█▄▐█·▄█ ▀█▄██▀▐█ ▐█.▪\n▐█▌▐▌▐█▌.▐▌▐█▄▪▐█▐█▌██▐█▌▐█▄▪▐█▐█▌▐█▄▪▐███▌▐▀ ▐█▌·\n.▀▀▀  ▀█▄▀▪·▀▀▀▀ ▀▀▀▀▀ █▪ ▀▀▀▀ ▀▀▀·▀▀▀▀ ▀▀▀ · ▀▀▀\n${YELLOW}                 LogInsight v$(VERSION)\n\n
+LOGO=\n\n${RED}▄▄▌         ▄▄ • ▪   ▐ ▄ .▄▄ · ▪   ▄▄ •  ▄ .▄▄▄▄▄▄\n██•  ▪     ▐█ ▀ ▪██ •█▌▐█▐█ ▀. ██ ▐█ ▀ ▪██▪▐█•██  \n██▪   ▄█▀▄ ▄█ ▀█▄▐█·▐█▐▐▌▄▀▀▀█▄▐█·▄█ ▀█▄██▀▐█ ▐█.▪\n▐█▌▐▌▐█▌.▐▌▐█▄▪▐█▐█▌██▐█▌▐█▄▪▐█▐█▌▐█▄▪▐███▌▐▀ ▐█▌·\n.▀▀▀  ▀█▄▀▪·▀▀▀▀ ▀▀▀▀▀ █▪ ▀▀▀▀ ▀▀▀·▀▀▀▀ ▀▀▀ · ▀▀▀\n${RED}                 LogInsight v$(VERSION)\n\n
 
 all: $(OBJECTS)
 	@mkdir -p $(OBJ_DIR) # Ensure obj directory exists
@@ -31,11 +31,14 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
+	@echo -e "${LOGO}"
+	@echo -e "${YELLOW}               🧹 Cleaning up..."
+	@echo -e ""
 	rm -rf $(OBJ_DIR)/*.o LogInsight
 	rm -rf $(OBJ_DIR)
 
 run: all
-	./LogInsight
+	./LogInsight --help
 
 install:
 	@echo -e "${LOGO}"
@@ -56,11 +59,11 @@ uninstall:
 help:
 	@echo -e "${LOGO}"
 	@echo -e "${YELLOW}🛠️ Usage:"
-	@echo -e "  make              Build the project"
-	@echo -e "  make run          Build and run the project"
-	@echo -e "  make clean        Remove object files and the executable"
-	@echo -e "  make install      Install app"
-	@echo -e "  make uninstall    Uninstall app"
-	@echo -e "  make help         Show this help message${RESET}"
+	@echo -e "    make              Build the project"
+	@echo -e "    make run          Build and run the project"
+	@echo -e "    make clean        Remove object files and the executable"
+	@echo -e "    make install      Install app"
+	@echo -e "    make uninstall    Uninstall app"
+	@echo -e "    make help         Show this help message${RESET}"
 
 .PHONY: all clean run help
