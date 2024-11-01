@@ -1,4 +1,5 @@
 #include "log_monitor.h"
+#include "file_size.h"
 #include "log_color.h"
 #include "log_filter.h"
 #include <errno.h>
@@ -17,6 +18,12 @@
 #define BUFFER_SIZE 4096
 #define EVENT_SIZE (sizeof(struct inotify_event))
 #define EVENT_BUF_LEN (1024 * (EVENT_SIZE + 16))
+
+#define RED "\033[0;31m"
+#define YELLOW "\033[1;33m"
+#define GREEN "\033[0;32m"
+#define BLUE "\033[0;34m"
+#define NC "\033[0m"
 
 static int running = 1;
 
@@ -90,11 +97,14 @@ void process_lines(char *buffer, const char *filter_level) {
 }
 
 void print_statistics() {
-  printf("\nLog Statistics:\n");
-  printf("CRITICAL: %ld\n", critical_count);
-  printf("WARNING: %ld\n", warning_count);
-  printf("INFO: %ld\n", info_count);
-  printf("DEBUG: %ld\n", debug_count);
+  printf(BLUE "┌─────────────────────────────\n│    Log Statistics:\n");
+  printf(BLUE "│" RED " 🔴 CRITICAL: %ld\n", critical_count);
+  printf(BLUE "│" YELLOW " 🟡 WARNING: %ld\n", warning_count);
+  printf(BLUE "│" GREEN " 🟢 INFO: %ld\n", info_count);
+  printf(BLUE "│"
+              " 🔵 DEBUG: %ld\n" NC,
+         debug_count);
+  printf(BLUE "└─────────────────────────────\n");
 }
 
 void start_log_monitor(const char *file_name, const char *filter_level,
@@ -118,6 +128,7 @@ void start_log_monitor(const char *file_name, const char *filter_level,
     }
 
     close(fd);
+    print_file_size(file_name);
     print_statistics();
     return;
   }
@@ -176,6 +187,7 @@ void start_log_monitor(const char *file_name, const char *filter_level,
 
   inotify_rm_watch(inotify_fd, wd);
 
+  print_file_size(file_name);
   print_statistics();
 
   close(fd);
