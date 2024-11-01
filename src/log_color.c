@@ -14,9 +14,10 @@ void colorize_log(const char *line) {
   int reti;
 
   const char *patterns[] = {"\\|\\s*CRITICAL\\s*\\|", "\\|\\s*WARNING\\s*\\|",
-                            "\\|\\s*INFO\\s*\\|", "\\|\\s*DEBUG\\s*\\|"};
+                            "\\|\\s*INFO\\s*\\|", "\\|\\s*DEBUG\\s*\\|",
+                            "\\|\\s*ERROR\\s*\\|"};
 
-  for (int i = 0; i < 4; i++) {
+  for (int i = 0; i < 5; i++) {
     reti = regcomp(&regex, patterns[i], REG_EXTENDED | REG_ICASE);
     if (reti) {
       fprintf(stderr, "Could not compile regex\n");
@@ -37,6 +38,9 @@ void colorize_log(const char *line) {
         break;
       case 3: // DEBUG
         printf("%s%s%s\n", BLUE, line, NC);
+        break;
+      case 4: // ERROR
+        printf("%s%s%s\n", RED, line, NC);
         break;
       }
       regfree(&regex);
