@@ -7,6 +7,9 @@
 #define YELLOW "\033[1;33m"
 #define GREEN "\033[0;32m"
 #define BLUE "\033[0;34m"
+#define PURPLE "\033[0;35m"
+#define WHITE "\033[1;37m"
+#define ORANGE "\033[38;5;214m"
 #define NC "\033[0m"
 
 void colorize_log(const char *line) {
@@ -14,8 +17,9 @@ void colorize_log(const char *line) {
   int reti;
 
   const char *patterns[] = {"\\|\\s*CRITICAL\\s*\\|", "\\|\\s*WARNING\\s*\\|",
-                            "\\|\\s*INFO\\s*\\|", "\\|\\s*DEBUG\\s*\\|",
-                            "\\|\\s*ERROR\\s*\\|"};
+                            "\\|\\s*INFO\\s*\\|",     "\\|\\s*DEBUG\\s*\\|",
+                            "\\|\\s*ERROR\\s*\\|",    "\\|\\s*UNKNOWN\\s*\\|",
+                            "\\|\\s*TRACE\\s*\\|",    "\\|\\s*FATAL\\s*\\|"};
 
   for (int i = 0; i < 5; i++) {
     reti = regcomp(&regex, patterns[i], REG_EXTENDED | REG_ICASE);
