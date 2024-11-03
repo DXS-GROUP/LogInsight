@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 from file_reader import get_file_info, read_lines
 from log_filter import filter_by_level, filter_by_datetime
-from colorizer import Colorizer
+from colorizer import Colorizer  # Assuming you have this class for coloring log messages
 
 class LogAnalyzer:
     def __init__(self, file_path, levels=None, date_range=None):
@@ -11,7 +11,7 @@ class LogAnalyzer:
         self.levels = levels
         self.date_range = date_range
         self.lines_count = 0
-        self.colorizer = Colorizer()
+        self.colorizer = Colorizer()  # Initialize Colorizer
 
     def format_file_size(self, size):
         """Format file size into appropriate units."""
@@ -48,6 +48,33 @@ class LogAnalyzer:
             return "DEBUG"
         return "INFO"
 
+    def output_statistics(self, lines):
+        """Output statistics about the analyzed log."""
+        self.lines_count = len(lines)
+
+        for line in lines:
+            level = self.extract_log_level(line)
+            colored_line = self.colorizer.colorize(line.strip(), level)
+            print(colored_line)
+
+        print("\n\033[0;34m┌─────────────────────────────⬤")
+
+        print(f"│ Lines read: {self.lines_count}")
+
+        file_info = get_file_info(self.file_path)
+        
+        formatted_size = self.format_file_size(file_info['size'])
+        
+        print(f"│ File size: {formatted_size}")
+
+        creation_date, modification_date = self.get_file_dates()
+
+        if creation_date and modification_date:
+            print(f"│ Creation date: {creation_date}")
+            print(f"│ Last modification date: {modification_date}")
+
+        print("\033[0;34m└─────────────────────────────⬤")
+
     def analyze(self):
         """Analyze the log file and output statistics."""
         lines = read_lines(self.file_path)
@@ -58,23 +85,4 @@ class LogAnalyzer:
         if self.levels:
             lines = filter_by_level(lines, self.levels)
 
-        self.lines_count = len(lines)
-
-        for line in lines:
-            level = self.extract_log_level(line)
-            colored_line = self.colorizer.colorize(line.strip(), level)
-            print(colored_line)
-
-        print(f"\nNumber of lines: {self.lines_count}")
-
-        file_info = get_file_info(self.file_path)
-
-        formatted_size = self.format_file_size(file_info['size'])
-        
-        print(f"File size: {formatted_size}")
-
-        creation_date, modification_date = self.get_file_dates()
-
-        if creation_date and modification_date:
-            print(f"Creation date: {creation_date}")
-            print(f"Last modification date: {modification_date}")
+        self.output_statistics(lines)

@@ -1,12 +1,22 @@
 import re
 from datetime import datetime
 
+def create_log_level_pattern(filter_level):
+    """Creates a regex pattern for matching log levels in log lines."""
+    filter_level_escaped = re.escape(filter_level)
+    pattern = r'\|\s*' + filter_level_escaped + r'\s*\|'
+    
+    return pattern
+
 def filter_by_level(lines, levels):
     """Filters rows by log level."""
     if not levels:
         return lines
-    levels_set = set(levels)
-    return [line for line in lines if any(level in line for level in levels_set)]
+    levels_set = set(level.lower() for level in levels)
+    patterns = [create_log_level_pattern(level) for level in levels_set]
+    combined_pattern = re.compile('|'.join(patterns), re.IGNORECASE)
+    return [line for line in lines if combined_pattern.search(line)]
+
 
 def filter_by_datetime(lines, date_range):
     """Filters rows by date and time."""

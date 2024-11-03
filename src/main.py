@@ -29,13 +29,34 @@ def parse_date(date_str):
         return None
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Log analyzer")
-    parser.add_argument('-i', '--input', required=True, help='Path to log file')
-    parser.add_argument('-f', '--filter', help='Comma separated log level')
-    parser.add_argument('-r', '--real-time', action='store_true', help='Real-time')
-    parser.add_argument('-d', '--date', help='Date or date range (YYYYY-MM-DD or HH:MM)')
+def print_logo():
+    """Prints the logo of the program."""
+    logo = """\033[0;31m
 
+
+        ▄▄▌         ▄▄ • ▪   ▐ ▄ .▄▄ · ▪   ▄▄ •  ▄ .▄▄▄▄▄▄
+        ██•  ▪     ▐█ ▀ ▪██ •█▌▐█▐█ ▀. ██ ▐█ ▀ ▪██▪▐█•██  
+        ██▪   ▄█▀▄ ▄█ ▀█▄▐█·▐█▐▐▌▄▀▀▀█▄▐█·▄█ ▀█▄██▀▐█ ▐█.▪
+        ▐█▌▐▌▐█▌.▐▌▐█▄▪▐█▐█▌██▐█▌▐█▄▪▐█▐█▌▐█▄▪▐███▌▐▀ ▐█▌·
+        .▀▀▀  ▀█▄▀▪·▀▀▀▀ ▀▀▀▀▀ █▪ ▀▀▀▀ ▀▀▀·▀▀▀▀ ▀▀▀ · ▀▀▀ 
+
+                    ✨ Created by Nighty3098
+
+    """
+    print(logo)
+
+def main():
+    print_logo()
+
+    parser = argparse.ArgumentParser(description="\033[0;32m🐍 Log analyzer\033[0;33m")
+    parser.add_argument('-i', '--input', required=True, help='Path to log file')
+    parser.add_argument('-f', '--filter', help="""Comma separated log level. Example: \033[0;32m -f ERROR,WARNING\033[0;33m""")
+    parser.add_argument('-r', '--real-time', action='store_true', help='Real-time')
+    parser.add_argument('-d', '--date', help="""Date or date range (YYYY-MM-DD or HH:MM).
+                                            Example:
+                                            \033[0;32m -d "2024-07-31 23:42:42.960, 2024-08-09 12:42:34.947"\033[0;33m
+                                            or \033[0;32m -d "2024-07-31 23:42:42"
+                                            """)
     args = parser.parse_args()
 
     levels = args.filter.split(',') if args.filter else None
