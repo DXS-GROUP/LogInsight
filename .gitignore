@@ -14,3 +14,4 @@ LogInsight
 .vscode/c_cpp_properties.json
 managed_context/metadata.json
 test_suite_analysis/metadata.json
+old_memuse.txt
