@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <sys/stat.h>
 
-#define RED "\033[0;31m"
+#define RED "\033[1;31m"
 #define NC "\033[0m"
 
 void print_file_size(const char *file_name) {

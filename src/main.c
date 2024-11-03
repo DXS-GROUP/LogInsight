@@ -4,9 +4,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define MAX_FILTERS 10
+#define MAX_FILTER_LENGTH 256
+
 void print_usage(const char *program_name) {
   printf("\n");
-  printf("\n\033[0;32m");
+  printf("\n\033[0;31m");
   printf("▄▄▌         ▄▄ • ▪   ▐ ▄ .▄▄ · ▪   ▄▄ •  ▄ .▄▄▄▄▄▄\n");
   printf("██•  ▪     ▐█ ▀ ▪██ •█▌▐█▐█ ▀. ██ ▐█ ▀ ▪██▪▐█•██  \n");
   printf("██▪   ▄█▀▄ ▄█ ▀█▄▐█·▐█▐▐▌▄▀▀▀█▄▐█·▄█ ▀█▄██▀▐█ ▐█.▪\n");
@@ -23,7 +26,8 @@ void print_usage(const char *program_name) {
 
 int main(int argc, char *argv[]) {
   const char *file_name = NULL;
-  const char *filter_level = NULL;
+  char *filter_levels[MAX_FILTERS];
+  int filter_count = 0;
   int real_time = 0;
 
   for (int i = 1; i < argc; i++) {
@@ -33,7 +37,9 @@ int main(int argc, char *argv[]) {
       print_usage(argv[0]);
       return EXIT_SUCCESS;
     } else if (strcmp(argv[i], "-f") == 0 && i + 1 < argc) {
-      filter_level = argv[++i];
+      if (filter_count < MAX_FILTERS) {
+        filter_levels[filter_count++] = argv[++i];
+      }
     } else if (strcmp(argv[i], "-r") == 0) {
       real_time = 1;
     }
@@ -44,7 +50,7 @@ int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  start_log_monitor(file_name, filter_level, real_time);
+  start_log_monitor(file_name, filter_levels, filter_count, real_time);
 
   return EXIT_SUCCESS;
 }

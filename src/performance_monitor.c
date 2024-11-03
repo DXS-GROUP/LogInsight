@@ -3,7 +3,7 @@
 static struct timeval start_time;
 static struct rusage start_usage;
 
-#define GREEN "\033[0;32m"
+#define GREEN "\033[1;32m"
 
 void start_monitoring() {
   gettimeofday(&start_time, NULL);
