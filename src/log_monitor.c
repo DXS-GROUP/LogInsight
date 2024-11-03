@@ -17,7 +17,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#define BUFFER_SIZE 1024 // Размер буфера для построчной обработки
+#define INITIAL_BUFFER_SIZE 1024 // Начальный размер буфера для чтения
 #define EVENT_SIZE (sizeof(struct inotify_event))
 #define EVENT_BUF_LEN (1024 * EVENT_SIZE)
 
@@ -40,9 +40,7 @@ long int unknown_count = 0;
 long int fatal_count = 0;
 
 regex_t regex_patterns[8];
-
 static int running = 1;
-
 pthread_mutex_t count_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void handle_signal(int signal)
@@ -56,15 +54,15 @@ void handle_signal(int signal)
 
 void compile_regex_patterns()
 {
-  const char *patterns[] = {"\\|\\s*CRITICAL\\s*\\|", "\\|\\s*WARNING\\s*\\|",
-                            "\\|\\s*INFO\\s*\\|", "\\|\\s*DEBUG\\s*\\|",
-                            "\\|\\s*ERROR\\s*\\|", "\\|\\s*UNKNOWN\\s*\\|",
-                            "\\|\\s*TRACE\\s*\\|", "\\|\\s*FATAL\\s*\\|"};
+  const char *patterns[] = {
+      "\\|\\s*CRITICAL\\s*\\|", "\\|\\s*WARNING\\s*\\|",
+      "\\|\\s*INFO\\s*\\|", "\\|\\s*DEBUG\\s*\\|",
+      "\\|\\s*ERROR\\s*\\|", "\\|\\s*UNKNOWN\\s*\\|",
+      "\\|\\s*TRACE\\s*\\|", "\\|\\s*FATAL\\s*\\|"};
 
   for (int i = 0; i < sizeof(patterns) / sizeof(patterns[0]); i++)
   {
-    if (regcomp(&regex_patterns[i], patterns[i], REG_EXTENDED | REG_ICASE) !=
-        0)
+    if (regcomp(&regex_patterns[i], patterns[i], REG_EXTENDED | REG_ICASE) != 0)
     {
       fprintf(stderr, "Failed to compile regex: %s\n", patterns[i]);
       exit(EXIT_FAILURE);
@@ -139,12 +137,15 @@ void process_line(const char *line, char *filter_levels[], int filter_count)
   }
 }
 
-void start_log_monitor(const char *file_name, char *filter_levels[],
-                       int filter_count, int real_time)
+void start_log_monitor(const char *file_name, char *filter_levels[], int filter_count, int real_time, int show_stats)
 {
   signal(SIGINT, handle_signal);
 
   compile_regex_patterns();
+  if (show_stats)
+  {
+    start_monitoring();
+  }
 
   int fd = open(file_name, O_RDONLY);
   if (fd == -1)
@@ -154,15 +155,19 @@ void start_log_monitor(const char *file_name, char *filter_levels[],
     return;
   }
 
-  char buffer[BUFFER_SIZE];
+  char *buffer = malloc(INITIAL_BUFFER_SIZE);
+  size_t buffer_size = INITIAL_BUFFER_SIZE;
+  size_t current_length = 0;
 
   if (!real_time)
   {
     ssize_t bytes_read;
 
-    while ((bytes_read = read(fd, buffer, sizeof(buffer) - 1)) > 0)
+    while ((bytes_read = read(fd, buffer + current_length, buffer_size - current_length - 1)) > 0)
     {
-      buffer[bytes_read] = '\0';
+      current_length += bytes_read;
+      buffer[current_length] = '\0';
+
       char *line_start = buffer;
       char *line_end;
 
@@ -172,13 +177,21 @@ void start_log_monitor(const char *file_name, char *filter_levels[],
         process_line(line_start, filter_levels, filter_count);
         line_start = line_end + 1;
       }
-      process_line(line_start, filter_levels, filter_count);
+
+      // Move remaining data to the beginning of the buffer
+      current_length -= (line_start - buffer);
+      memmove(buffer, line_start, current_length);
     }
 
     close(fd);
     print_file_size(file_name);
     print_statistics();
+    if (show_stats)
+    {
+      stop_monitoring();
+    }
     free_regex_patterns();
+    free(buffer);
     return;
   }
 
@@ -187,6 +200,7 @@ void start_log_monitor(const char *file_name, char *filter_levels[],
   {
     perror("inotify_init");
     close(fd);
+    free(buffer);
     return;
   }
 
@@ -196,6 +210,7 @@ void start_log_monitor(const char *file_name, char *filter_levels[],
     perror("inotify_add_watch");
     close(fd);
     close(inotify_fd);
+    free(buffer);
     return;
   }
 
@@ -212,6 +227,7 @@ void start_log_monitor(const char *file_name, char *filter_levels[],
     tv.tv_usec = 0;
 
     int retval = select(inotify_fd + 1, &readfds, NULL, NULL, &tv);
+
     if (retval == -1)
     {
       perror("select");
@@ -223,6 +239,7 @@ void start_log_monitor(const char *file_name, char *filter_levels[],
     }
 
     char event_buf[EVENT_BUF_LEN];
+
     ssize_t bytes = read(inotify_fd, event_buf, EVENT_BUF_LEN);
 
     if (bytes < 0)
@@ -232,12 +249,26 @@ void start_log_monitor(const char *file_name, char *filter_levels[],
     }
 
     lseek(fd, offset, SEEK_SET);
-    ssize_t bytes_read = read(fd, buffer, sizeof(buffer) - 1);
+    ssize_t bytes_read = read(fd, buffer + current_length, buffer_size - current_length - 1);
 
     if (bytes_read > 0)
     {
-      buffer[bytes_read] = '\0';
-      process_line(buffer, filter_levels, filter_count);
+      current_length += bytes_read;
+      buffer[current_length] = '\0';
+
+      char *line_start = buffer;
+      char *line_end;
+
+      while ((line_end = strchr(line_start, '\n')) != NULL)
+      {
+        *line_end = '\0';
+        process_line(line_start, filter_levels, filter_count);
+        line_start = line_end + 1;
+      }
+
+      // Move remaining data to the beginning of the buffer
+      current_length -= (line_start - buffer);
+      memmove(buffer, line_start, current_length);
       offset += bytes_read;
     }
   }
@@ -246,9 +277,12 @@ void start_log_monitor(const char *file_name, char *filter_levels[],
 
   print_file_size(file_name);
   print_statistics();
-
-  stop_monitoring();
-
   free_regex_patterns();
+  if (show_stats)
+  {
+    stop_monitoring();
+  }
+
   close(fd);
+  free(buffer);
 }

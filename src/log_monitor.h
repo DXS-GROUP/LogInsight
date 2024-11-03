@@ -4,7 +4,7 @@
 #include <pthread.h>
 
 void start_log_monitor(const char *file_name, char *filter_levels[],
-                       int filter_count, int real_time);
+                       int filter_count, int real_time, int show_stats);
 void process_line(const char *line, char *filter_levels[], int filter_count);
 void count_log_levels(const char *line);
 
