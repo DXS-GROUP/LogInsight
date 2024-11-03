@@ -3,9 +3,10 @@
 
 #include <pthread.h>
 
-void start_log_monitor(const char *file_name, const char *filter_level,
-                       int real_time);
-void *count_log_levels(void *arg);
+void start_log_monitor(const char *file_name, char *filter_levels[],
+                       int filter_count, int real_time, int show_stats);
+void process_line(const char *line, char *filter_levels[], int filter_count);
+void count_log_levels(const char *line);
 
 extern pthread_mutex_t count_mutex;
 
