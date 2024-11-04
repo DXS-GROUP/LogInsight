@@ -39,20 +39,6 @@ cd src
 python3 main.py -h
 ```
 
-<div align="center">
-
-#### Usage
-
-</div>
-
-```
-Usage: ./LogInsight [-r] [-f <level>] -i <file>
-  -r             Display all changes in real time
-  -f <level>     Level filtering (CRITICAL, WARNING, INFO, DEBUG)
-  -i <file>      Path to log file
-  -h, --help     Show this help
-```
-
 <br><br><br>
 
 <img src="imgs/1.png" />
