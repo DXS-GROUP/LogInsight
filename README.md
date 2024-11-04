@@ -20,6 +20,9 @@
 <img src="https://github.com/Nighty3098/DevIcons/blob/main/badges/badges_linux.png?raw=true" width="50px" />
 <img src="https://github.com/Nighty3098/DevIcons/blob/main/badges/badges_bash.png?raw=true" width="50px" />
 
+<a href="https://github.com/DXS-GROUP/LogInsight/tree/InDev"><kbd> <br>DEV VERSION<br> </kbd></a>
+<a href="https://github.com/DXS-GROUP/LogInsight/tree/PythonDev"><kbd> <br>PYTHON VERSION<br> </kbd></a>
+
 #### Installing:
 
 </div>
