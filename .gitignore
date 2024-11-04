@@ -16,3 +16,5 @@ managed_context/metadata.json
 test_suite_analysis/metadata.json
 old_memuse.txt
 new_memuse.txt
+/li
+/src/__pycache__
