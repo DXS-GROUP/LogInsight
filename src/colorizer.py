@@ -6,6 +6,7 @@ class Colorizer:
         'INFO': '\033[0;32m',    # Green
         'WARNING': '\033[0;33m', # Yellow
         'ERROR': '\033[0;31m',   # Red
+        'CRITICAL': '\033[0;31m',   # Red
         'DEBUG': '\033[0;34m',   # Blue
         'TRACE': '\033[0m', # WHITE
         'RESET': '\033[0m'     # Reset to default color

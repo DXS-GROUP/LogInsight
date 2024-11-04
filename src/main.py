@@ -4,11 +4,11 @@ from datetime import datetime, timedelta
 from dateutil import parser as date_parser
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
+import sys
 
 from file_reader import get_file_info, read_lines
 from log_filter import filter_by_level, filter_by_datetime
 from log_analyzer import LogAnalyzer
-
 
 class LogEventHandler(FileSystemEventHandler):
     def __init__(self, analyzer):
@@ -16,9 +16,7 @@ class LogEventHandler(FileSystemEventHandler):
 
     def on_modified(self, event):
         if event.src_path == self.analyzer.file_path:
-            # print("File modified. Updating the output...")
             self.analyzer.analyze()
-
 
 def parse_date(date_str):
     """Parses a date or time string into a datetime object."""
@@ -28,58 +26,51 @@ def parse_date(date_str):
         print(f"Error: '{date_str}' is not a valid date or time.")
         return None
 
-
 def print_logo():
     """Prints the logo of the program."""
-    logo = """\033[0;31m
-
-
+    version = "1.0.2-Py"
+    logo = f"""\033[0;31m
         ▄▄▌         ▄▄ • ▪   ▐ ▄ .▄▄ · ▪   ▄▄ •  ▄ .▄▄▄▄▄▄
         ██•  ▪     ▐█ ▀ ▪██ •█▌▐█▐█ ▀. ██ ▐█ ▀ ▪██▪▐█•██  
         ██▪   ▄█▀▄ ▄█ ▀█▄▐█·▐█▐▐▌▄▀▀▀█▄▐█·▄█ ▀█▄██▀▐█ ▐█.▪
         ▐█▌▐▌▐█▌.▐▌▐█▄▪▐█▐█▌██▐█▌▐█▄▪▐█▐█▌▐█▄▪▐███▌▐▀ ▐█▌·
         .▀▀▀  ▀█▄▀▪·▀▀▀▀ ▀▀▀▀▀ █▪ ▀▀▀▀ ▀▀▀·▀▀▀▀ ▀▀▀ · ▀▀▀ 
 
+                           {version}
                     ✨ Created by Nighty3098
-
     """
     print(logo)
 
 def main():
-    print_logo()
+    if len(sys.argv) == 1 or '-h' in sys.argv or '--help' in sys.argv:
+        print_logo()
 
-    parser = argparse.ArgumentParser(description="\033[0;32m🐍 Log analyzer\033[0;33m")
+    parser = argparse.ArgumentParser(description="\033[0;32m🐍 Log analyzer\033[0;33m", 
+                                     formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('-i', '--input', required=True, help='Path to log file')
-    parser.add_argument('-f', '--filter', help="""Comma separated log level. Example: \033[0;32m -f ERROR,WARNING\033[0;33m""")
-    parser.add_argument('-r', '--real-time', action='store_true', help='Real-time')
-    parser.add_argument('-d', '--date', help="""Date or date range (YYYY-MM-DD or HH:MM).
-                                            Example:
-                                            \033[0;32m -d "2024-07-31 23:42:42.960, 2024-08-09 12:42:34.947"\033[0;33m
-                                            or \033[0;32m -d "2024-07-31 23:42:42"
-                                            """)
+    parser.add_argument('-f', '--filter', help="""Comma separated log level. Example: 
+                        \033[0;32m -f ERROR,WARNING\033[0;33m""")
+    parser.add_argument('-r', '--real-time', action='store_true', 
+                        help='Enable real-time monitoring of log file changes')
+    parser.add_argument('-d', '--date', 
+                        help="""Date or date range (YYYY-MM-DD HH:MM).
+                        Examples:
+                        \033[0;32m-d "2024-07-31 23:42:42.960, 2024-08-09 12:42:34.947"\033[0;33m
+                        or \033[0;32m -d "2024-07-31 23:42:42"
+                        or \033[0;32m -d "2024-07-31"
+                        """)
+
     args = parser.parse_args()
 
     levels = args.filter.split(',') if args.filter else None
-    
     date_range = None
+
     if args.date:
-        dates = args.date.split(',')
-        parsed_dates = []
-        
-        for date_str in dates:
-            parsed_date = parse_date(date_str.strip())
-            if parsed_date:
-                parsed_dates.append(parsed_date)
+        dates = [parser.parse(d.strip()) for d in args.date.split(',')]
+        date_range = (dates[0], dates[1]) if len(dates) == 2 else (dates[0], dates[0] + timedelta(days=1))
 
-        if len(parsed_dates) == 1:
-            single_date = parsed_dates[0]
-            date_range = (single_date, single_date + timedelta(days=1))
-        elif len(parsed_dates) == 2:
-            date_range = (parsed_dates[0], parsed_dates[1])
-
-    from log_analyzer import LogAnalyzer  
     analyzer = LogAnalyzer(args.input, levels=levels, date_range=date_range)
-
+    
     observer = None
 
     if args.real_time:
@@ -87,7 +78,7 @@ def main():
         observer = Observer()
         observer.schedule(event_handler, path=args.input, recursive=False)
         observer.start()
-    
+
     analyzer.analyze()
 
     if args.real_time:
@@ -99,7 +90,6 @@ def main():
     
     if observer:
         observer.join()
-
 
 if __name__ == "__main__":
     main()
