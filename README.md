@@ -2,7 +2,7 @@
 
 # LogInsight
 
-<img src="imgs/1.png" />
+<img src="imgs/4.png" />
 
 ### Program for analyzing log files and detecting anomalies in program operation
 
@@ -20,16 +20,23 @@
 <img src="https://github.com/Nighty3098/DevIcons/blob/main/badges/badges_linux.png?raw=true" width="50px" />
 <img src="https://github.com/Nighty3098/DevIcons/blob/main/badges/badges_bash.png?raw=true" width="50px" />
 
-#### Installing:
-
 </div>
+
+#### Installing:
 
 ```bash
 git clone https://github.com/Nighty3098/LogInsight
 cd LogInsight
-make
-sudo ln LogInsight /bin/
-LogInsight
+python3 -m venv LI
+source LI/bin/activate
+pip3 install -r requirements.txt
+cd src
+```
+
+#### USAGE
+
+```
+python3 main.py -h
 ```
 
 <div align="center">
@@ -45,4 +52,10 @@ Usage: ./LogInsight [-r] [-f <level>] -i <file>
   -i <file>      Path to log file
   -h, --help     Show this help
 ```
+
+<br><br><br>
+
+<img src="imgs/1.png" />
 <img src="imgs/2.png" />
+<img src="imgs/3.png" />
+<img src="imgs/4.png" />
