@@ -63,11 +63,12 @@ def main():
     args = parser.parse_args()
 
     levels = args.filter.split(',') if args.filter else None
-    date_range = None
 
     if args.date:
-        dates = [parser.parse(d.strip()) for d in args.date.split(',')]
-        date_range = (dates[0], dates[1]) if len(dates) == 2 else (dates[0], dates[0] + timedelta(days=1))
+        dates = [parse_date(d.strip()) for d in args.date.split(',')]
+        date_range = (dates[0], dates[1]) if len(dates) == 2 else None
+    else:
+        date_range = None
 
     analyzer = LogAnalyzer(args.input, levels=levels, date_range=date_range)
     
