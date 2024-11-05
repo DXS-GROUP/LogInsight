@@ -2,3 +2,5 @@
 /.vscode
 /li
 /src/__pycache__
+/obj
+/venv
