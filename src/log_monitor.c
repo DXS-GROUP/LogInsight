@@ -278,10 +278,7 @@ void start_log_monitor(const char *file_name, char *filter_levels[], int filter_
   print_file_size(file_name);
   print_statistics();
   free_regex_patterns();
-  if (show_stats)
-  {
-    stop_monitoring();
-  }
+  stop_monitoring();
 
   close(fd);
   free(buffer);
