@@ -30,14 +30,18 @@ def print_logo():
     """Prints the logo of the program."""
     version = "1.0.2-Py"
     logo = f"""\033[0;31m
+
+
         ▄▄▌         ▄▄ • ▪   ▐ ▄ .▄▄ · ▪   ▄▄ •  ▄ .▄▄▄▄▄▄
         ██•  ▪     ▐█ ▀ ▪██ •█▌▐█▐█ ▀. ██ ▐█ ▀ ▪██▪▐█•██  
         ██▪   ▄█▀▄ ▄█ ▀█▄▐█·▐█▐▐▌▄▀▀▀█▄▐█·▄█ ▀█▄██▀▐█ ▐█.▪
         ▐█▌▐▌▐█▌.▐▌▐█▄▪▐█▐█▌██▐█▌▐█▄▪▐█▐█▌▐█▄▪▐███▌▐▀ ▐█▌·
         .▀▀▀  ▀█▄▀▪·▀▀▀▀ ▀▀▀▀▀ █▪ ▀▀▀▀ ▀▀▀·▀▀▀▀ ▀▀▀ · ▀▀▀ 
 
+
                            {version}
                     ✨ Created by Nighty3098
+
     """
     print(logo)
 
@@ -45,20 +49,12 @@ def main():
     if len(sys.argv) == 1 or '-h' in sys.argv or '--help' in sys.argv:
         print_logo()
 
-    parser = argparse.ArgumentParser(description="\033[0;32m🐍 Log analyzer\033[0;33m", 
-                                     formatter_class=argparse.RawTextHelpFormatter)
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('-i', '--input', required=True, help='Path to log file')
-    parser.add_argument('-f', '--filter', help="""Comma separated log level. Example: 
-                        \033[0;32m -f ERROR,WARNING\033[0;33m""")
+    parser.add_argument('-f', '--filter', help="""Comma separated log level""")
     parser.add_argument('-r', '--real-time', action='store_true', 
                         help='Enable real-time monitoring of log file changes')
-    parser.add_argument('-d', '--date', 
-                        help="""Date or date range (YYYY-MM-DD HH:MM).
-                        Examples:
-                        \033[0;32m-d "2024-07-31 23:42:42.960, 2024-08-09 12:42:34.947"\033[0;33m
-                        or \033[0;32m -d "2024-07-31 23:42:42"
-                        or \033[0;32m -d "2024-07-31"
-                        """)
+    parser.add_argument('-d', '--date', help="""Date or date range (YYYY-MM-DD HH:MM)""")
 
     args = parser.parse_args()
 
@@ -71,7 +67,6 @@ def main():
         date_range = None
 
     analyzer = LogAnalyzer(args.input, levels=levels, date_range=date_range)
-    
     observer = None
 
     if args.real_time:
@@ -88,8 +83,7 @@ def main():
                 time.sleep(1)
         except KeyboardInterrupt:
             observer.stop()
-    
-    if observer:
+    elif observer:
         observer.join()
 
 if __name__ == "__main__":
