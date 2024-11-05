@@ -28,7 +28,7 @@ void print_usage(const char *program_name)
 int main(int argc, char *argv[])
 {
   const char *file_name = NULL;
-  char *filter_levels[MAX_FILTERS] = {NULL};
+  char *filter_levels[MAX_FILTERS];
   int filter_count = 0;
   int real_time = 0;
   int show_stats = 0;
@@ -49,11 +49,6 @@ int main(int argc, char *argv[])
       if (filter_count < MAX_FILTERS)
       {
         filter_levels[filter_count++] = argv[++i];
-      }
-      else
-      {
-        fprintf(stderr, "Error: Maximum number of filters (%d) exceeded.\n", MAX_FILTERS);
-        return EXIT_FAILURE;
       }
     }
     else if (strcmp(argv[i], "-r") == 0)

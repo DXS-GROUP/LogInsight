@@ -1,7 +1,4 @@
 #include "performance_monitor.h"
-#include <stdio.h>
-#include <sys/time.h>
-#include <sys/resource.h>
 
 static struct timeval start_time;
 static struct rusage start_usage;
@@ -22,17 +19,27 @@ void stop_monitoring()
   gettimeofday(&end_time, NULL);
   getrusage(RUSAGE_SELF, &end_usage);
 
-  double elapsed = (end_time.tv_sec - start_time.tv_sec) +
-                   (end_time.tv_usec - start_time.tv_usec) * 1e-6;
+  long seconds = end_time.tv_sec - start_time.tv_sec;
+  long microseconds = end_time.tv_usec - start_time.tv_usec;
+  double elapsed = seconds + microseconds * 1e-6;
 
   long memory_used = end_usage.ru_maxrss;
-  double cpu_time = (end_usage.ru_utime.tv_sec + end_usage.ru_stime.tv_sec) +
-                    (end_usage.ru_utime.tv_usec + end_usage.ru_stime.tv_usec) * 1e-6;
+
+  long user_cpu_time =
+      end_usage.ru_utime.tv_sec * 1000000 + end_usage.ru_utime.tv_usec;
+  long system_cpu_time =
+      end_usage.ru_stime.tv_sec * 1000000 + end_usage.ru_stime.tv_usec;
+  double cpu_time = (user_cpu_time + system_cpu_time) / 1000000.0;
 
   printf(GREEN "┌─────────────────────────────⬤ \n");
-  printf("│ ⬤  Elapsed time: %.3f %s\n",
-         elapsed < 1.0 ? elapsed * 1000 : elapsed,
-         elapsed < 1.0 ? "milliseconds" : "seconds");
+  if (elapsed < 1.0)
+  {
+    printf("│ ⬤  Elapsed time: %.3f milliseconds\n", elapsed * 1000);
+  }
+  else
+  {
+    printf("│ ⬤  Elapsed time: %.3f seconds\n", elapsed);
+  }
 
   if (memory_used < 1024)
   {
@@ -47,9 +54,13 @@ void stop_monitoring()
     printf("│ ⬤  Memory used: %.2f MB\n", memory_used / (1024.0 * 1024.0));
   }
 
-  printf("│ ⬤  CPU time: %.3f %s\n",
-         cpu_time < 1.0 ? cpu_time * 1000 : cpu_time,
-         cpu_time < 1.0 ? "milliseconds" : "seconds");
-
+  if (cpu_time < 1.0)
+  {
+    printf("│ ⬤  CPU time: %.3f milliseconds\n", cpu_time * 1000);
+  }
+  else
+  {
+    printf("│ ⬤  CPU time: %.3f seconds\n", cpu_time);
+  }
   printf("└─────────────────────────────⬤ \n");
 }
